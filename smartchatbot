@@ -1,0 +1,63 @@
+
+streamlit_code = """
+import streamlit as st
+import subprocess
+import sys
+
+# Function to execute user code
+def execute_code(user_code):
+    try:
+        # Create a temporary file to save the user code
+        with open("temp_code.py", "w") as f:
+            f.write(user_code)
+
+        # Execute the code using subprocess
+        result = subprocess.run(
+            [sys.executable, "temp_code.py"],
+            capture_output=True,
+            text=True
+        )
+
+        # Return the output and error (if any)
+        return result.stdout, result.stderr
+    except Exception as e:
+        return "", str(e)
+
+# Function to handle greetings
+def handle_greeting(user_input):
+    greetings = ["hello", "hi", "hey", "greetings"]
+    if any(greet in user_input.lower() for greet in greetings):
+        return "Hello! How can I assist you with your code today?"
+    return None
+
+# Main Streamlit application
+def main():
+    st.title("Smart Code Generation and Testing Platform")
+
+    user_input = st.text_input("Enter your query (greeting or code):")
+
+    # Check for greetings
+    greeting_response = handle_greeting(user_input)
+    if greeting_response:
+        st.write(greeting_response)
+    else:
+        # If it's not a greeting, assume it's code
+        if user_input:
+            st.write("Executing your code...")
+            output, error = execute_code(user_input)
+
+            if error:
+                st.error(f"Error in code execution:\\n{error}")
+            else:
+                st.success("Code executed successfully!")
+                st.text_area("Output:", output, height=300)
+
+if __name__ == "__main__":
+    main()
+"""
+
+# Write the code to a Python file
+with open("smart_code_platform.py", "w") as f:
+    f.write(streamlit_code)
+
+print("Streamlit app code has been saved to smart_code_platform.py")
